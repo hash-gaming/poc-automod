@@ -18,11 +18,17 @@ module.exports = (robot) => {
     const { SLACK_API_TOKEN } = process.env;
     console.log(req.body);
 
-    await createOrUnarchiveGroup(SLACK_API_TOKEN, channelName);
+    const discussionGroup = await createOrUnarchiveGroup(SLACK_API_TOKEN, channelName);
+    console.log(discussionGroup);
 
-    const currentChannel = await describeGroup(SLACK_API_TOKEN, req.body.channel_id);
-    console.log(currentChannel);
+    const describeResponse = await describeGroup(SLACK_API_TOKEN, req.body.channel_id);
+    console.log(describeResponse);
 
-    res.send('Creating private group to discuss.');
+    if (!describeResponse.ok && describeResponse.error === 'channel_not_found') {
+      res.send('This is a public channel, just invite yo!');
+    }
+    else {
+      res.send('Creating private group to discuss.');
+    }
   }));
 };

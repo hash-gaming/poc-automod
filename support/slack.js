@@ -38,12 +38,14 @@ async function listGroups(token) {
 
 async function createOrUnarchiveGroup(token, channelName) {
   const createResponse = await createGroup(token, channelName);
+  const channelList = await listGroups(token);
+  const channel = channelList.groups.filter(g => g.name === channelName)[0];
 
   if (!createResponse.ok && createResponse.error === 'name_taken') {
-    const channelList = await listGroups(token);
-    const archivedDiscussion = channelList.groups.filter(g => g.name === channelName)[0];
-    await unarchiveGroup(token, archivedDiscussion.id);
+    await unarchiveGroup(token, channel.id);
   }
+
+  return channel;
 }
 
 module.exports = {
