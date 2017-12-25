@@ -9,6 +9,15 @@ async function createGroup(token, name) {
   });
 }
 
+async function unarchiveGroup(token, channel) {
+  return request({
+    url: 'https://slack.com/api/groups.unarchive',
+    method: 'POST',
+    form: { token, channel },
+    json: true
+  });
+}
+
 async function describeGroup(token, channel) {
   return request({
     url: 'https://slack.com/api/groups.info',
@@ -18,7 +27,29 @@ async function describeGroup(token, channel) {
   });
 }
 
+async function listGroups(token) {
+  return request({
+    url: 'https://slack.com/api/groups.list',
+    method: 'POST',
+    form: { token },
+    json: true
+  });
+}
+
+async function createOrUnarchiveGroup(token, channelName) {
+  const createResponse = await createGroup(token, channelName);
+
+  if (!createResponse.ok && createResponse.error === 'name_taken') {
+    const channelList = await listGroups(token);
+    const archivedDiscussion = channelList.groups.filter(g => g.name === channelName)[0];
+    await unarchiveGroup(token, archivedDiscussion.id);
+  }
+}
+
 module.exports = {
   createGroup,
-  describeGroup
+  unarchiveGroup,
+  describeGroup,
+  listGroups,
+  createOrUnarchiveGroup
 };
