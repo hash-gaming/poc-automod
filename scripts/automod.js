@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const { describeGroup } = require('../support/slack');
+const { describeGroup, createGroup } = require('../support/slack');
 
 const wrap = require('../support/wrapAsync');
 const verifyIncomingWebhook = require('../support/verifyWebhook');
@@ -11,10 +11,14 @@ module.exports = (robot) => {
   });
 
   robot.router.post('/automod/discuss', verifyIncomingWebhook, wrap(async (req, res) => {
+    const { SLACK_API_TOKEN } = process.env;
     console.log(req.body);
 
-    const response = await describeGroup(process.env.SLACK_API_TOKEN, req.body.channel_id);
-    console.log(response);
+    const createResponse = await createGroup(SLACK_API_TOKEN, `discuss_${req.body.text}`);
+    console.log(createResponse);
+
+    const currentChannel = await describeGroup(SLACK_API_TOKEN, req.body.channel_id);
+    console.log(currentChannel);
 
     res.send('Creating private room to discuss.');
   }));
