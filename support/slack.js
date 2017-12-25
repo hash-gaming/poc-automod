@@ -1,20 +1,14 @@
 const request = require('request-promise');
 
-async function authorize(code) {
-  const { SLACK_CLIENT_ID, SLACK_CLIENT_SECRET } = process.env;
-
+async function describeGroup(token, channel) {
   return request({
-    url: 'https://slack.com/api/oauth.access',
+    url: 'https://slack.com/api/groups.info',
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: {
-      client_id: SLACK_CLIENT_ID,
-      client_secret: SLACK_CLIENT_SECRET,
-      code: code
-    }
+    form: { token, channel },
+    json: true
   });
 }
 
 module.exports = {
-  authorize
+  describeGroup
 };
