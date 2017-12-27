@@ -66,6 +66,11 @@ async function createOrUnarchiveGroup(token, channelName) {
   return channel;
 }
 
+async function isUserAdmin(token, userId) {
+  const { user } = await describeUser(token, userId);
+  return user.is_admin || user.is_owner;
+}
+
 module.exports = {
   createGroup,
   unarchiveGroup,
@@ -73,5 +78,6 @@ module.exports = {
   listGroups,
   inviteUser,
   describeUser,
-  createOrUnarchiveGroup
+  createOrUnarchiveGroup,
+  isUserAdmin
 };
