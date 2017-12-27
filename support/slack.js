@@ -45,6 +45,15 @@ async function inviteUser(token, channel, user) {
   });
 }
 
+async function describeUser(token, user) {
+  return request({
+    url: 'https://slack.com/api/users.info',
+    method: 'POST',
+    form: { token, user },
+    json: true
+  });
+}
+
 async function createOrUnarchiveGroup(token, channelName) {
   const createResponse = await createGroup(token, channelName);
   const channelList = await listGroups(token);
@@ -63,5 +72,6 @@ module.exports = {
   describeGroup,
   listGroups,
   inviteUser,
+  describeUser,
   createOrUnarchiveGroup
 };

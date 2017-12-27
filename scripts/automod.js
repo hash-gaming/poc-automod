@@ -15,7 +15,8 @@ module.exports = (robot) => {
   });
 
   robot.router.post('/automod/discuss', verifyIncomingWebhook, wrap(async (req, res) => {
-    const channelName = `discuss_${req.body.text}`;
+    const userName = req.body.text.replace('@', '');
+    const channelName = `discuss_${userName}`;
     const { SLACK_API_TOKEN } = process.env;
 
     const discussionGroup = await createOrUnarchiveGroup(SLACK_API_TOKEN, channelName);
