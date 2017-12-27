@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const {
   describeGroup,
+  inviteUser,
   createOrUnarchiveGroup
 } = require('../support/slack');
 
@@ -16,13 +17,11 @@ module.exports = (robot) => {
   robot.router.post('/automod/discuss', verifyIncomingWebhook, wrap(async (req, res) => {
     const channelName = `discuss_${req.body.text}`;
     const { SLACK_API_TOKEN } = process.env;
-    console.log(req.body);
 
     const discussionGroup = await createOrUnarchiveGroup(SLACK_API_TOKEN, channelName);
-    console.log(discussionGroup);
-
     const describeResponse = await describeGroup(SLACK_API_TOKEN, req.body.channel_id);
-    console.log(describeResponse);
+
+    describeResponse.group.members.map(m => inviteUser(SLACK_API_TOKEN, discussionGroup.id, m));
 
     if (!describeResponse.ok && describeResponse.error === 'channel_not_found') {
       res.send('This is a public channel, just invite yo!');
