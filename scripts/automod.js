@@ -34,4 +34,13 @@ module.exports = (robot) => {
       res.send('Creating private group to discuss.');
     }
   }));
+
+  robot.router.post('/automod/kick_everyone', verifyIncomingWebhook, wrap(isAdminCheck), wrap(async (req, res) => {
+    console.log(req.body);
+    res.send('Kicking everyone and closing the channel...');
+
+    const { SLACK_API_TOKEN } = process.env;
+    const channelDetails = await describeGroup(SLACK_API_TOKEN, req.body.channel_id);
+    console.log(channelDetails);
+  }));
 };
