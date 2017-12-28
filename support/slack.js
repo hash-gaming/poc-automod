@@ -54,6 +54,15 @@ async function describeUser(token, user) {
   });
 }
 
+async function kickUser(token, channel, user) {
+  return request({
+    url: 'https://slack.com/api/groups.kick',
+    method: 'POST',
+    form: { token, channel, user },
+    json: true
+  });
+}
+
 async function createOrUnarchiveGroup(token, channelName) {
   const createResponse = await createGroup(token, channelName);
   const channelList = await listGroups(token);
@@ -78,6 +87,7 @@ module.exports = {
   listGroups,
   inviteUser,
   describeUser,
+  kickUser,
   createOrUnarchiveGroup,
   isUserAdmin
 };
