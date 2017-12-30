@@ -9,6 +9,15 @@ async function createGroup(token, name) {
   });
 }
 
+async function archiveGroup(token, channel) {
+  return request({
+    url: 'https://slack.com/api/groups.archive',
+    method: 'POST',
+    form: { token, channel },
+    json: true
+  });
+}
+
 async function unarchiveGroup(token, channel) {
   return request({
     url: 'https://slack.com/api/groups.unarchive',
@@ -63,6 +72,15 @@ async function kickUser(token, channel, user) {
   });
 }
 
+async function leaveChannel(token, channel) {
+  return request({
+    url: 'https://slack.com/api/groups.leave',
+    method: 'POST',
+    form: { token, channel },
+    json: true
+  });
+}
+
 async function createOrUnarchiveGroup(token, channelName) {
   const createResponse = await createGroup(token, channelName);
   const channelList = await listGroups(token);
@@ -82,12 +100,14 @@ async function isUserAdmin(token, userId) {
 
 module.exports = {
   createGroup,
+  archiveGroup,
   unarchiveGroup,
   describeGroup,
   listGroups,
   inviteUser,
   describeUser,
   kickUser,
+  leaveChannel,
   createOrUnarchiveGroup,
   isUserAdmin
 };
