@@ -3,6 +3,9 @@ require('dotenv').config();
 const {
   describeGroup,
   inviteUser,
+  kickUser,
+  leaveChannel,
+  archiveGroup,
   createOrUnarchiveGroup
 } = require('../support/slack');
 
@@ -17,7 +20,6 @@ module.exports = (robot) => {
   // this async function doesn't have a try/catch, which you would need otherwise
   // because we use the wrap function to forward errors to the client.
   robot.router.post('/automod/discuss', verifyIncomingWebhook, wrap(isAdminCheck), wrap(async (req, res) => {
-    console.log(req.body);
     const userName = req.body.text.replace('@', '');
     const channelName = `discuss_${userName}`;
     const { SLACK_API_TOKEN } = process.env;
@@ -36,11 +38,18 @@ module.exports = (robot) => {
   }));
 
   robot.router.post('/automod/kick_everyone', verifyIncomingWebhook, wrap(isAdminCheck), wrap(async (req, res) => {
-    console.log(req.body);
     res.send('Kicking everyone and closing the channel...');
 
     const { SLACK_API_TOKEN } = process.env;
-    const channelDetails = await describeGroup(SLACK_API_TOKEN, req.body.channel_id);
-    console.log(channelDetails);
+    const { group } = await describeGroup(SLACK_API_TOKEN, req.body.channel_id);
+
+    await Promise.all(
+      group.members
+      .filter(m => m !== req.body.user_id)
+      .map(m => kickUser(SLACK_API_TOKEN, group.id, m))
+    );
+
+    await leaveChannel(SLACK_API_TOKEN, group.id);
+    await archiveGroup(SLACK_API_TOKEN, group.id);
   }));
 };
