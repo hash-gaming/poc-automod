@@ -6,11 +6,14 @@ const {
   kickUser,
   leaveChannel,
   archiveGroup,
+  setPurpose,
+  postMessage,
   createOrUnarchiveGroup
 } = require('../support/slack');
 
 const wrap = require('../support/wrapAsync');
 const { verifyIncomingWebhook, isAdminCheck } = require('../middleware');
+const { automod } = require('../support/strings-en');
 
 module.exports = (robot) => {
   robot.respond(/hi|hello|howdy/i, (res) => {
@@ -34,6 +37,18 @@ module.exports = (robot) => {
 
       describeResponse.group.members.map(m => inviteUser(SLACK_API_TOKEN, discussionGroup.id, m));
       res.send('Creating private group to discuss.');
+
+      await setPurpose(
+        SLACK_API_TOKEN,
+        discussionGroup.id,
+        automod.discussionChannelPurpose.replace(/#{MEMBER_NAME}/g, userName)
+      );
+
+      await postMessage(
+        SLACK_API_TOKEN,
+        discussionGroup.id,
+        automod.discussionChannelPurpose.replace(/#{MEMBER_NAME}/g, userName)
+      );
     }
   }));
 
