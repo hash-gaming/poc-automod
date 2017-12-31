@@ -81,6 +81,29 @@ async function leaveChannel(token, channel) {
   });
 }
 
+async function setPurpose(token, channel, purpose) {
+  return request({
+    url: 'https://slack.com/api/chat.postMessage',
+    method: 'POST',
+    form: { token, channel, purpose },
+    json: true
+  });
+}
+
+async function postMessage(token, channel, text, options) {
+  return request({
+    url: 'https://slack.com/api/chat.postMessage',
+    method: 'POST',
+    form: {
+      token,
+      channel,
+      text,
+      ...options
+    },
+    json: true
+  });
+}
+
 async function createOrUnarchiveGroup(token, channelName) {
   const createResponse = await createGroup(token, channelName);
   const channelList = await listGroups(token);
@@ -108,6 +131,8 @@ module.exports = {
   describeUser,
   kickUser,
   leaveChannel,
+  setPurpose,
+  postMessage,
   createOrUnarchiveGroup,
   isUserAdmin
 };
